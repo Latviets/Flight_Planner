@@ -28,11 +28,20 @@ namespace WebApplication1.Controllers
 
         public IActionResult DeleteFlight(int id)
         {
-            //lock (FlightStorage.FlightLock)
-            //{
+            lock (FlightStorage.FlightLock)
+            {
+
                 _storage.DeleteFlight(id);
-                return Ok();
+            return Ok();
+            //var flight = _storage.GetFlightById(id);
+            //if (flight != null)
+            //{
+            //    _storage.DeleteFlight(id);
+            //    return Ok();
             //}
+
+            //return NotFound();
+            }
         }
 
         [HttpPost]
@@ -41,8 +50,8 @@ namespace WebApplication1.Controllers
         {
             var flight = _storage.ConvertToFlight(flightRequest);
 
-            //lock (FlightStorage.FlightLock)
-            //{
+            lock (FlightStorage.FlightLock)
+            {
                 if (_storage.CheckExistingFlights(flight))
                 {
                     return Conflict();
@@ -56,9 +65,8 @@ namespace WebApplication1.Controllers
                 }
 
                 _storage.AddFlight(flight);
-
                 return Created("", flight);
-            //}
+            }
         }
 
         private static bool CheckIfValidDates(Flight flight)

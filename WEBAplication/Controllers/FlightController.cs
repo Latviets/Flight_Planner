@@ -18,28 +18,28 @@ namespace WebApplication1.Controllers
         {
             var trimedPhrase = search.Trim().ToLower();
 
-            var fromAirportCodes = _storage.GetFlights()
-                .Where(a =>
-                    a.From.Country.ToLower().Contains(trimedPhrase) ||
-                    a.From.City.ToLower().Contains(trimedPhrase) ||
-                    a.From.AirportCode.ToLower().Contains(trimedPhrase))
-                .Select(a => a.From);
+            var fromAirportCodes = _storage.GetAirports()
+                .Where(port =>
+                    port.Country.ToLower().Contains(trimedPhrase) ||
+                    port.City.ToLower().Contains(trimedPhrase) ||
+                    port.AirportCode.ToLower().Contains(trimedPhrase))
+                .Select(a => a);
 
-            var toAirportCodes = _storage.GetFlights()
-                .Where(a =>
-                    a.To.Country.ToLower().Contains(trimedPhrase) ||
-                    a.To.City.ToLower().Contains(trimedPhrase) ||
-                    a.To.AirportCode.ToLower().Contains(trimedPhrase))
-                .Select(a => a.To);
+            //var toAirportCodes = _storage.GetAirports()
+            //    .Where(port =>
+            //        port.Country.ToLower().Contains(trimedPhrase) ||
+            //        port.City.ToLower().Contains(trimedPhrase) ||
+            //        port.AirportCode.ToLower().Contains(trimedPhrase))
+            //    .Select(a => a.AirportCode);
 
-            var matchingAirports = fromAirportCodes
-                .Union(toAirportCodes)
-                .Distinct()
-                .ToList();
+            //var matchingAirports = fromAirportCodes
+            //    .Union(toAirportCodes)
+            //    .Distinct()
+            //    .ToList();
 
-            if (matchingAirports.Any())
+            if (fromAirportCodes.Any())
             {
-                return Ok(matchingAirports);
+                return Ok(fromAirportCodes);
             }
 
             return NotFound("No airports found");
@@ -83,12 +83,12 @@ namespace WebApplication1.Controllers
         {
             var flight = _storage.GetFlightById(id);
 
-            if (flight is null)
+            if (flight != null)
             {
-                return NotFound();
+                return Ok(flight);
             }
 
-            return Ok(flight);
+            return NotFound();
         }
     }
 }

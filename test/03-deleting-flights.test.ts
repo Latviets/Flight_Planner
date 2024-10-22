@@ -16,8 +16,8 @@ describe("Delete Flights", () => {
     );
 
     const flight = (await AdminFlightApi.addFlight(request)).data;
-
     const response = await AdminFlightApi.deleteFlight(flight.id);
+
     expect(response.status).toBe(200);
 
     try {
