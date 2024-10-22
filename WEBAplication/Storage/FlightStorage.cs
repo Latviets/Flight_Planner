@@ -1,86 +1,83 @@
-﻿using System.Net;
+﻿using System.Linq;
+using System.Net;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using WebApplication1.Database;
 using WebApplication1.Models;
 
 namespace WebApplication1.Storage
 {
-    public static class FlightStorage
+    public class FlightStorage(FlightPlannerDBContext context)
     {
-        private static List<Flight> _flights = new List<Flight>();
-        private static int _id = 0;
+        //private static List<Flight> _flights = new List<Flight>();
+
         private static readonly object _flightLock = new object();
         public static object FlightLock => _flightLock;
 
-        public static Flight AddFlight(Flight flight)
-        {
-            lock (_flightLock)
-            {
-                flight.Id = ++_id;
+        private readonly FlightPlannerDBContext _context = context;
 
-                _flights.Add(flight);
+        public Flight AddFlight(Flight flight)
+        {
+            //lock (_flightLock)
+            //{
+                _context.Flights.Add(flight);
+                _context.SaveChanges();
 
                 return flight;
-            }
+           // }
         }
-        public static Flight Testing(Flight flight)
+
+        public Flight GetFlightById(int id)
         {
-            lock (_flightLock)
-            {
-                flight.Id = ++_id;
-
-                _flights.Add(flight);
-
-                return flight;
-            }
+            return _context.Flights.FirstOrDefault(fl => fl.Id == id);
         }
 
-        public static Flight GetFlightById(int id)
+        public void DeleteFlight(int id)
         {
-            return _flights.FirstOrDefault(fl => fl.Id == id);
+            //lock (_flightLock)
+            //{
+                var item = _context.Flights.FirstOrDefault(fl => fl.Id == id);
+
+            _context.Flights.Remove(item);
+            _context.SaveChanges();
+            //}
         }
 
-        public static void DeleteFlight(int id)
+        public List<Flight> GetFlights()
         {
-            lock (_flightLock)
-            {
-                var item = _flights.SingleOrDefault(fl => fl.Id == id);
-
-                _flights.Remove(item);
-            }
+            var list = _context.Flights;
+            return [..list];
         }
 
-        public static List<Flight> GetFlights()
+        public void ClearFlights()
         {
-            return _flights;
+            _context.Flights.RemoveRange(_context.Flights);
+            _context.Airports.RemoveRange(_context.Airports);
+            _context.SaveChanges();
         }
 
-        public static void ClearFlights()
+        public bool CheckExistingFlights(Flight flight)
         {
-            _flights.Clear();
+            //lock (_flightLock)
+            //{
+                return _context.Flights.Contains(flight);
+                //(fl =>
+                //    fl.From.Country == flight.From.Country &&
+                //    fl.From.City == flight.From.City &&
+                //    fl.From.AirportCode == flight.From.AirportCode &&
+                //    fl.To.Country == flight.To.Country &&
+                //    fl.To.City == flight.To.City &&
+                //    fl.To.AirportCode == flight.To.AirportCode &&
+                //    fl.DepartureTime == flight.DepartureTime &&
+                //    fl.ArrivalTime == flight.ArrivalTime);
+            //}
         }
 
-        public static bool CheckExistingFlights(Flight flight)
-        {
-            lock (_flightLock)
-            {
-                return _flights.Any(fl =>
-                    fl.From.Country == flight.From.Country &&
-                    fl.From.City == flight.From.City &&
-                    fl.From.AirportCode == flight.From.AirportCode &&
-                    fl.To.Country == flight.To.Country &&
-                    fl.To.City == flight.To.City &&
-                    fl.To.AirportCode == flight.To.AirportCode &&
-                    fl.DepartureTime == flight.DepartureTime &&
-                    fl.ArrivalTime == flight.ArrivalTime);
-            }
-        }
-
-        public static Flight ConvertToFlight(FlightRequest flightRequest)
+        public Flight ConvertToFlight(FlightRequest flightRequest)
         {
             return new Flight
             {
-                Id = 0,
+                //Id = 0,
                 From = flightRequest.From,
                 To = flightRequest.To,
                 Carrier = flightRequest.Carrier,

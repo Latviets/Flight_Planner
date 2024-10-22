@@ -7,8 +7,10 @@ namespace WebApplication1.Controllers
 {
     [Route("api")]
     [ApiController]
-    public class FlightController : ControllerBase
+    public class FlightController(FlightStorage storage) : ControllerBase
     {
+        private readonly FlightStorage _storage = storage;
+
         [Route("airports")]
         [HttpGet]
 
@@ -16,14 +18,14 @@ namespace WebApplication1.Controllers
         {
             var trimedPhrase = search.Trim().ToLower();
 
-            var fromAirportCodes = FlightStorage.GetFlights()
+            var fromAirportCodes = _storage.GetFlights()
                 .Where(a =>
                     a.From.Country.ToLower().Contains(trimedPhrase) ||
                     a.From.City.ToLower().Contains(trimedPhrase) ||
                     a.From.AirportCode.ToLower().Contains(trimedPhrase))
                 .Select(a => a.From);
 
-            var toAirportCodes = FlightStorage.GetFlights()
+            var toAirportCodes = _storage.GetFlights()
                 .Where(a =>
                     a.To.Country.ToLower().Contains(trimedPhrase) ||
                     a.To.City.ToLower().Contains(trimedPhrase) ||
@@ -58,7 +60,7 @@ namespace WebApplication1.Controllers
             var trimmedTo = req.To.Trim().ToLower();
             var parsedDate = DateTime.Parse(req.DepartureDate).Date;
 
-            var flightsResult = FlightStorage.GetFlights()
+            var flightsResult = _storage.GetFlights()
                 .Where(fl =>
                     fl.From.AirportCode.Trim().ToLower() == trimmedFrom &&
                     fl.To.AirportCode.Trim().ToLower() == trimmedTo &&
@@ -79,7 +81,7 @@ namespace WebApplication1.Controllers
 
         public IActionResult GetFlight(int id)
         {
-            var flight = FlightStorage.GetFlightById(id);
+            var flight = _storage.GetFlightById(id);
 
             if (flight is null)
             {
