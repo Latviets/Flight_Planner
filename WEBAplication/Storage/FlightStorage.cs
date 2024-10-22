@@ -23,6 +23,17 @@ namespace WebApplication1.Storage
                 return flight;
             }
         }
+        public static Flight Testing(Flight flight)
+        {
+            lock (_flightLock)
+            {
+                flight.Id = ++_id;
+
+                _flights.Add(flight);
+
+                return flight;
+            }
+        }
 
         public static Flight GetFlightById(int id)
         {
