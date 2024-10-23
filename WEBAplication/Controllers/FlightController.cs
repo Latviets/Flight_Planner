@@ -25,18 +25,6 @@ namespace WebApplication1.Controllers
                     port.AirportCode.ToLower().Contains(trimedPhrase))
                 .Select(a => a);
 
-            //var toAirportCodes = _storage.GetAirports()
-            //    .Where(port =>
-            //        port.Country.ToLower().Contains(trimedPhrase) ||
-            //        port.City.ToLower().Contains(trimedPhrase) ||
-            //        port.AirportCode.ToLower().Contains(trimedPhrase))
-            //    .Select(a => a.AirportCode);
-
-            //var matchingAirports = fromAirportCodes
-            //    .Union(toAirportCodes)
-            //    .Distinct()
-            //    .ToList();
-
             if (fromAirportCodes.Any())
             {
                 return Ok(fromAirportCodes);

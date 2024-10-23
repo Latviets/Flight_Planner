@@ -30,17 +30,8 @@ namespace WebApplication1.Controllers
         {
             lock (FlightStorage.FlightLock)
             {
-
                 _storage.DeleteFlight(id);
-            return Ok();
-            //var flight = _storage.GetFlightById(id);
-            //if (flight != null)
-            //{
-            //    _storage.DeleteFlight(id);
-            //    return Ok();
-            //}
-
-            //return NotFound();
+                return Ok();
             }
         }
 

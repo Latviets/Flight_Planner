@@ -10,8 +10,6 @@ namespace WebApplication1.Storage
 {
     public class FlightStorage(FlightPlannerDBContext context)
     {
-        //private static List<Flight> _flights = new List<Flight>();
-
         private static readonly object _flightLock = new object();
         public static object FlightLock => _flightLock;
 
@@ -46,7 +44,6 @@ namespace WebApplication1.Storage
                     _context.Flights.Remove(item);
                     _context.SaveChanges();
                 }
-
             }
         }
 
@@ -56,6 +53,7 @@ namespace WebApplication1.Storage
                 .Include(fl => fl.From)
                 .Include(fl => fl.To)
                 .ToList();
+
             return list;
         }
 
@@ -77,30 +75,26 @@ namespace WebApplication1.Storage
 
         public bool CheckExistingFlights(Flight flight)
         {
-            //lock (_flightLock)
-            //{
             if (flight == null || flight.From == null || flight.To == null)
             {
                 return false;
             }
 
             return _context.Flights.Any(fl =>
-        fl.From.Country == flight.From.Country &&
-        fl.From.City == flight.From.City &&
-        fl.From.AirportCode == flight.From.AirportCode &&
-        fl.To.Country == flight.To.Country &&
-        fl.To.City == flight.To.City &&
-        fl.To.AirportCode == flight.To.AirportCode &&
-        fl.DepartureTime == flight.DepartureTime &&
-        fl.ArrivalTime == flight.ArrivalTime);
-            //}
+                fl.From.Country == flight.From.Country &&
+                fl.From.City == flight.From.City &&
+                fl.From.AirportCode == flight.From.AirportCode &&
+                fl.To.Country == flight.To.Country &&
+                fl.To.City == flight.To.City &&
+                fl.To.AirportCode == flight.To.AirportCode &&
+                fl.DepartureTime == flight.DepartureTime &&
+                fl.ArrivalTime == flight.ArrivalTime);
         }
 
         public Flight ConvertToFlight(FlightRequest flightRequest)
         {
             return new Flight
             {
-                //Id = 0,
                 From = flightRequest.From,
                 To = flightRequest.To,
                 Carrier = flightRequest.Carrier,
