@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using WebApplication1.Database;
 using WebApplication1.Models;
 using WebApplication1.Storage;
 
@@ -8,14 +10,16 @@ namespace WebApplication1.Controllers
     [Route("admin-api")]
     [ApiController]
     [Authorize]
-    public class AdminController : ControllerBase
+    public class AdminController(FlightStorage storage) : ControllerBase
     {
+        private readonly FlightStorage _storage = storage;
+
         [Route("flights/{id}")]
         [HttpGet]
 
         public IActionResult GetFlight(int id)
         {
-            var flight = FlightStorage.GetFlightById(id);
+            var flight = _storage.GetFlightById(id);
             return NotFound(flight);
         }
 
@@ -26,7 +30,7 @@ namespace WebApplication1.Controllers
         {
             lock (FlightStorage.FlightLock)
             {
-                FlightStorage.DeleteFlight(id);
+                _storage.DeleteFlight(id);
                 return Ok();
             }
         }
@@ -35,11 +39,11 @@ namespace WebApplication1.Controllers
         [Route("flights")]
         public IActionResult AddFlight(FlightRequest flightRequest)
         {
-            var flight = FlightStorage.ConvertToFlight(flightRequest);
+            var flight = _storage.ConvertToFlight(flightRequest);
 
             lock (FlightStorage.FlightLock)
             {
-                if (FlightStorage.CheckExistingFlights(flight))
+                if (_storage.CheckExistingFlights(flight))
                 {
                     return Conflict();
                 }
@@ -51,8 +55,7 @@ namespace WebApplication1.Controllers
                     return BadRequest();
                 }
 
-                FlightStorage.AddFlight(flight);
-
+                _storage.AddFlight(flight);
                 return Created("", flight);
             }
         }

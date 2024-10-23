@@ -16,7 +16,7 @@ describe("Adding Flights", () => {
 
   it("should be able to add flights", async done => {
     const response = await AdminFlightApi.addFlight(request);
-
+    
     expect(response.status).toBe(201);
 
     const flight = response.data;
@@ -51,7 +51,7 @@ describe("Adding Flights", () => {
 
   it("should not be able to add same flight twice", async done => {
     const response = await AdminFlightApi.addFlight(request);
-
+ 
     expect(response.status).toBe(201);
 
     try {
